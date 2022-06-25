@@ -12,36 +12,36 @@ jobs:
     runs-on: ubuntu-latest
   # only build if release hasn't been built yet
   # if: needs.check_release_exists.result == 'success'
-  steps:
-    - name: Checkout Repo 
-      uses: actions/checkout@v2
-    
-    - name: Install Dependencies
-      run: |
-        sudo apt update --yes
-        sudo apt install dos2unix emacs-nox python3-fontforge
+    steps:
+      - name: Checkout Repo 
+        uses: actions/checkout@v2
+      
+      - name: Install Dependencies
+        run: |
+          sudo apt update --yes
+          sudo apt install dos2unix emacs-nox python3-fontforge
 
-    - name: Export Build Plans
-      run: emacs -Q --batch -l org build.org -f org-babel-tangle
+      - name: Export Build Plans
+        run: emacs -Q --batch -l org build.org -f org-babel-tangle
 
-    - name: Fix Line Ending Errors
-      run: dos2unix private-build-plans.toml build.org rename.py
+      - name: Fix Line Ending Errors
+        run: dos2unix private-build-plans.toml build.org rename.py
 
-    - name: Set Font Vers
-      id: set-font-vers
-      run: |
-        VER=$(awk 'NR==1{print $2}' build.org | cut -d'v' -f2)
-        echo "IOSEVKA_VER=$VER" >> $GITHUB_ENV
-        RELVER=$(awk 'NR==2{print $2}' build.org)
-        echo "RELEASE_VER=$RELVER" >> $GITHUB_ENV
-    
-    - name: Build Josevka
-      run: docker run -e FONT_VERSION=${{env.IOSEVKA_VER}} -i -v $(pwd):/build avivace/iosevka-build ttf::josevka
+      - name: Set Font Vers
+        id: set-font-vers
+        run: |
+          VER=$(awk 'NR==1{print $2}' build.org | cut -d'v' -f2)
+          echo "IOSEVKA_VER=$VER" >> $GITHUB_ENV
+          RELVER=$(awk 'NR==2{print $2}' build.org)
+          echo "RELEASE_VER=$RELVER" >> $GITHUB_ENV
+      
+      - name: Build Josevka
+        run: docker run -e FONT_VERSION=${{env.IOSEVKA_VER}} -i -v $(pwd):/build avivace/iosevka-build ttf::josevka
 
-    - run: mkdir patched
+      - run: mkdir patched
 
-    - name: Patch Josevka
-      continue-on-error: true
-      run: docker run -v $(pwd)/dist/josevka/ttf:/in -v $(pwd)/patched/josevka:/out nerdfonts/patcher -c -l -q --no-progressbars --careful
+      - name: Patch Josevka
+        continue-on-error: true
+        run: docker run -v $(pwd)/dist/josevka/ttf:/in -v $(pwd)/patched/josevka:/out nerdfonts/patcher -c -l -q --no-progressbars --careful
 
-    - run: ls -alh $(pwd)/patched/josevka
+      - run: ls -alh $(pwd)/patched/josevka
