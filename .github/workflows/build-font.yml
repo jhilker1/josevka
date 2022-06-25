@@ -44,4 +44,4 @@ jobs:
         continue-on-error: true
         run: docker run -v $(pwd)/dist/josevka/ttf:/in -v $(pwd)/patched/josevka:/out nerdfonts/patcher -c -l -q --no-progressbars --careful
 
-      - run: ls -alh $(pwd)/patched/josevka
+      - run: fc-query "$(pwd)/patched/josevka/Josevka Nerd Font Complete.ttf"
