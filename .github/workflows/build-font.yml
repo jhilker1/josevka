@@ -1,4 +1,4 @@
-name: Rename Font
+name: Build Font
 on:
   push:
     branches:
@@ -6,8 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
- build_font:
+  build_font:
     runs-on: ubuntu-latest
+  # only build if release hasn't been built yet
+  # if: needs.check_release_exists.result == 'success'
     steps:
       - name: Checkout Repo 
         uses: actions/checkout@v2
@@ -29,14 +31,14 @@ jobs:
           echo "IOSEVKA_VER=$VER" >> $GITHUB_ENV
           RELVER=$(awk 'NR==2{print $2}' build.org)
           echo "RELEASE_VER=$RELVER" >> $GITHUB_ENV
-    
-    - name: Build Josevka Code
-      run: docker run -e FONT_VERSION=${{env.IOSEVKA_VER}} -i -v $(pwd):/build avivace/iosevka-build ttf::josevka
+      
+      - name: Build Josevka
+        run: docker run -e FONT_VERSION=${{env.IOSEVKA_VER}} -i -v $(pwd):/build avivace/iosevka-build ttf::josevka
 
       - run: mkdir patched
 
-      - name: Patch Josevka Code
+      - name: Patch Josevka
         continue-on-error: true
-        run: docker run -v $(pwd)/dist/josevka-code/ttf:/in -v $(pwd)/patched/josevkaCode:/out nerdfonts/patcher -c -l -q --no-progressbars --careful
+        run: docker run -v $(pwd)/dist/josevka/ttf:/in -v $(pwd)/patched/josevka:/out nerdfonts/patcher -c -l -q --no-progressbars --careful
 
-      - run: fc-query "$(pwd)/patched/josevkaCode/Josevka Nerd Font Complete.ttf"
+      - run: fc-query "$(pwd)/patched/josevka/Josevka Nerd Font Complete.ttf"
