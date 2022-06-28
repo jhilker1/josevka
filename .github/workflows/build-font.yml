@@ -10,8 +10,8 @@ on:
 jobs:
   build_font:
     runs-on: ubuntu-latest
-  # only build if release hasn't been built yet
-  # if: needs.check_release_exists.result == 'success'
+    # only build if release hasn't been built yet
+    # if: needs.check_release_exists.result == 'success'
     steps:
       - name: Checkout Repo 
         uses: actions/checkout@v2
