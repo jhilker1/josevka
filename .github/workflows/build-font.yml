@@ -1,10 +1,8 @@
-name: Build Font
+name: Rename Font
 on:
   push:
     branches:
       - fontforge-rename
-    paths:
-      - 'build.org'
   workflow_dispatch:
 
 jobs:
