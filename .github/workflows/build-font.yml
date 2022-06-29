@@ -41,4 +41,5 @@ jobs:
         continue-on-error: true
         run: docker run -v $(pwd)/dist/josevka-code/ttf:/in -v $(pwd)/patched/josevkaCode:/out nerdfonts/patcher -c -l -q --no-progressbars --careful
 
+      - run: find "$(pwd)/patched/josevkaCode" -name "*.ttf" -exec python3 rename.py {} 'Josevka Code' \;
       - run: fc-query "$(pwd)/patched/josevkaCode/Josevka Code Nerd Font Complete.ttf"
